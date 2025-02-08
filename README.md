@@ -1,1 +1,2 @@
-# polars-dataframe-validation
+# Glacier
+A Dataframe validation package for Polars
