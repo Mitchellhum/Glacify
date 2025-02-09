@@ -1,0 +1,2 @@
+-i https://pypi.org/simple
+polars==1.22.0

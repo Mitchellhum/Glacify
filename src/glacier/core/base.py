@@ -94,7 +94,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
 
             try:
                 # Implemented for when there will be more arguments
-                arguments = [dataframe]
+                arguments = [self, dataframe]
                 function_signature = signature(check)
                 argument_count = len(function_signature.parameters)
 
