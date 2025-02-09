@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Glacier"
+version = "0.1.0"
+authors = [
+  { name="Mitchell Hummel", email="mustbemitchell@gmail.com" },
+]
+description = "A Dataframe validation package for Polars"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+]
+license = { text = "MIT License" }
+dependencies = [
+  "polars>=1.22.0",
+  "polars<2.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/Mitchellhum/glacier"
+Issues = "https://github.com/Mitchellhum/glacier/issues"

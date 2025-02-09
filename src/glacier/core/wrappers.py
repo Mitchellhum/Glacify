@@ -28,7 +28,7 @@ def validation_check(selection: Optional[list[str]] = None) -> Callable:
     TypeError
         Raised when 'selection' is not a valid list with strings.
     """
-    type_error = "Argument 'selection' expects a list of string representing the column names needed for executing the validation check!"
+    type_error = "Argument 'selection' expects a list of strings representing the column names needed for executing the validation check!"
 
     if not selection:
         selection = ["*"]
