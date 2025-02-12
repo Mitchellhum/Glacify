@@ -1,7 +1,7 @@
 from typing import Callable, Optional
 
 
-def validation_check(selection: Optional[list[str]] = None) -> Callable:
+def validator(selection: Optional[list[str]] = None) -> Callable:
     """
     Wraps a function. The wrapped function will become a validation check when used
     in a ValidationBase-derived class. The wrapped function will receive a Polars LazyFrame
@@ -44,8 +44,8 @@ def validation_check(selection: Optional[list[str]] = None) -> Callable:
 
     # Set the validation check identifiers, so that the metaclass knows what to do
     def inner(function: Callable) -> Callable:
-        function._is_validation_function = True
-        function._column_selection = selection
+        function._is_validator = True
+        function._for_columns = selection
         return function
 
     return inner

@@ -1,10 +1,11 @@
-from glacier.core import ValidationBase, validation_check
-from glacier.models import Column
-from glacier.exc import ValidationCheckException, GlacierValidationException
+from glacier.base import ValidationBase
+from glacier.wrappers import validator 
+from glacier.column import Column
+from glacier.exceptions import ValidationCheckException, GlacierValidationException
 
 __all__ = [
     "ValidationBase",
-    "validation_check",
+    "validator",
     "Column",
     "ValidationCheckException",
     "GlacierValidationException",

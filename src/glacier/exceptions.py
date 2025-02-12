@@ -1,3 +1,10 @@
+class StructuralException(Exception):
+    def __init__(self, name: str, message: str) -> None:
+        self.name = name
+        self.message = message
+        super().__init__(message)
+
+
 class GlacierValidationException(Exception):
     def __init__(self, inner: dict[str, list]) -> None:
         self._inner = inner
