@@ -3,20 +3,18 @@ from typing import Callable, Optional
 
 def validator(selection: Optional[list[str]] = None) -> Callable:
     """
-    Wraps a function. The wrapped function will become a validation check when used
-    in a ValidationBase-derived class. The wrapped function will receive a Polars LazyFrame
-    if requested as argument. The LazyFrame will be a subselection based on the columns
-    assigned in the 'selection' parameter.
-
-    Allows the user to define a model-bound validation check and conveniently trigger
-    the check via the model.validate() function.
+    Wraps a function that returns a validation expression. All wrapped functions
+    are expected to receive at least 1 argument, which would be the column name. 
+    Wrapped functions are expected to return 2 arguments: a filter Expression
+    that would be valid polars, and an error which is shown whenever the filter 
+    is true for a row.
 
     Parameters
     ----------
     selection : Optional[list[str]]
-        A selection of column names, which will make the dataframe subselection. If None, will return
-        all columns in the dataframe to the wrapped function. If not None, will return the identifier column
-        + the columns as specified here. By default None
+        A list of all columns on which this validation expression needs to be
+        executed. By default None, which would mean all columns get checked by this 
+        expression.
 
     Returns
     -------

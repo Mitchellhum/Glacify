@@ -28,6 +28,9 @@ class Column:
     _model_validators: list[partial] = field(default_factory=lambda: [])
 
     def _resolve_polars_type(self, type_: PythonType) -> None:
+        """
+        Transforms the python type to a polars type.
+        """
         origin, args = get_origin(type_), get_args(type_)
 
         # Do we have a list?
@@ -45,6 +48,14 @@ class Column:
         return PYTHON_POLARS_TYPE_MAPPING.get(type_, String)
 
     def resolve(self, type_: PythonType) -> None:
+        """
+        Resolves all types, setters and validators that are default for this column and python type.
+
+        Parameters
+        ----------
+        type_ : PythonType
+            Type that is used as attribute annotation inside the model.
+        """
         self._type = self._resolve_polars_type(type_=type_)
         self._setters = get_setters(column=self.name, type_=type_, default=self.default)
         self._validators = get_validators(
@@ -57,13 +68,46 @@ class Column:
         )
 
     def add_validator(self, validator: partial) -> None:
+        """
+        Adds a validator to the list of column validators.
+
+        Parameters
+        ----------
+        validator : partial
+            A partial that accepts 'index' as argument, which identifies
+            which __error_index it is supposed to set in the dataframe.
+        """
         self._validators.append(validator)
 
     def get_validators(self) -> list[partial]:
+        """
+        Returns all currently set validators.
+
+        Returns
+        -------
+        list[partial]
+            A list of partial functions that return an Expression.
+        """
         return self._validators
 
     def add_setter(self, setter: Expr) -> None:
+        """
+        Adds a setter expression to the list of column setters.
+
+        Parameters
+        ----------
+        setter : Expr
+            An expression that sets or changes a value inside a column.
+        """
         self._setters.append(setter)
 
     def get_setters(self) -> list[Expr]:
+        """
+        Returns all currently set setter expressions.
+
+        Returns
+        -------
+        list[Expr]
+            A list of setters expressions.
+        """
         return self._setters
