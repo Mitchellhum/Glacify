@@ -50,7 +50,7 @@ class ValidationMetaClass(type):
                 continue
 
             column: Column = namespace.get(name, Column(name=name))
-            column._resolve(type_=type_)
+            column.resolve(type_=type_)
 
             # Multiple identifiers are allowed
             if column.is_identifier:
@@ -83,11 +83,13 @@ class ValidationMetaClass(type):
             raise ValueError(
                 f"Expected '{function_.__name__}' to take at least 1 parameter: 'column_name'"
             )
-        
+
         return True
 
     @classmethod
-    def _validate_columns(cls, columns: list[str], dataframe_columns: list[str]) -> None:
+    def _validate_columns(
+        cls, columns: list[str], dataframe_columns: list[str]
+    ) -> None:
         """
         Checks if the selected columns exist in the model.
         """
@@ -119,7 +121,7 @@ class ValidationMetaClass(type):
 
             for column_name in columns:
                 attribute_name = column_mapping.get(column_name)
-                column = namespace.get(attribute_name)
+                column: Column = namespace.get(attribute_name)
 
                 try:
                     expression, error = user_function(column_name)
@@ -131,7 +133,7 @@ class ValidationMetaClass(type):
                     )
 
                 validator = cls._create_validator(expression=expression, error=error)
-                column._validators.append(validator)
+                column.add_validator(validator=validator)
 
     @classmethod
     def _resolve_expressions(cls, namespace: dict) -> None:
@@ -143,14 +145,13 @@ class ValidationMetaClass(type):
                 continue
 
             column: Column = namespace.get(name, Column(name=name))
-            # Multiple identifiers are allowed
-            if column.is_identifier:
-                namespace["_identifier_columns"].append(column.name)
 
-            for setter in column._setters:
+            setters = column.get_setters()
+            validators = column.get_validators()
+            for setter in setters:
                 namespace["_setter_expressions"].append(setter)
 
-            for validator in column._validators:
+            for validator in validators:
                 namespace["_validator_expressions"].append(
                     validator(index=next(cls._index_generator))
                 )
