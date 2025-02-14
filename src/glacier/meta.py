@@ -1,6 +1,7 @@
 from functools import partial
 from inspect import signature
 from typing import Callable, Generator
+
 from polars import Expr, lit, when
 
 from glacier.column import Column
@@ -66,6 +67,7 @@ class ValidationMetaClass(type):
         Creates a partial out of the user defined function, so that it is in line
         with the other validators.
         """
+
         def _full_expression(index: int) -> Expr:
             return when(expression).then(lit(error)).alias(f"__error_{index}")
 
@@ -126,7 +128,7 @@ class ValidationMetaClass(type):
             # The function needs to be wrapped (which gives it an id attribute)
             if not cls._validate_function(function_=user_function):
                 continue
-            
+
             # Lets make sure all columns are valid
             columns = getattr(user_function, "_for_columns")
             cls._validate_columns(columns=columns, dataframe_columns=dataframe_columns)
@@ -170,7 +172,7 @@ class ValidationMetaClass(type):
             # Get all setters and validators that are assigned to the columns
             setters = column.get_setters()
             validators = column.get_validators()
-            
+
             # Set them to the model so it is easier to read in the end
             for setter in setters:
                 namespace["_setter_expressions"].append(setter)

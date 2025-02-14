@@ -1,4 +1,5 @@
 from datetime import date, datetime
+
 from polars import String, Int64, Boolean, Float64, List, Date, Datetime
 
 PythonType = str | int | float | bool | list | date | datetime
