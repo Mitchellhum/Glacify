@@ -1,26 +1,29 @@
 from collections import defaultdict
 from typing import Optional
 
-import polars.selectors as cs
 from polars import DataFrame, col, concat_list, concat_str
 from polars.exceptions import PolarsError
+from polars.selectors import contains
 
-from glacier.meta import ValidationMetaClass
 from glacier.exceptions import GlacierValidationException, GlacierCriticalException
+from glacier.meta import ValidationMetaClass
+from glacier.settings import ValidationSettings
 
 
 class ValidationBase(metaclass=ValidationMetaClass):
+    settings = ValidationSettings()
+
     def __init__(
-        self,
-        dataframe: Optional[DataFrame] = None,
-        strict_dtypes: bool = True,
+        self, dataframe: Optional[DataFrame] = None, strict: Optional[bool] = None
     ) -> None:
         self._dataframe = dataframe
-        self._strict_dtypes = strict_dtypes
         self._error_inner = defaultdict(list)
 
+        if strict is not None:
+            self.settings = ValidationSettings(strict=strict)
+
         # A shortcut
-        if dataframe:
+        if dataframe is not None:
             self.validate(dataframe=dataframe)
 
     def _dataframe_as_error(self) -> None:
@@ -45,7 +48,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
                         concat_str(self._identifier_columns, separator="_").alias(
                             "identifier"
                         ),
-                        concat_list(cs.contains("__error_"))
+                        concat_list(contains("__error_"))
                         .list.drop_nulls()
                         .alias("errors"),
                     ]
@@ -96,7 +99,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
         """
         try:
             expressions = [
-                col(column).cast(dtype=dtype, strict=self._strict_dtypes).name.keep()
+                col(column).cast(dtype=dtype, strict=self.settings.strict).name.keep()
                 for column, dtype in self._dataframe_schema.items()
             ]
             self._dataframe = self._dataframe.lazy().with_columns(expressions).collect()

@@ -1,4 +1,5 @@
 from typing import Optional
+
 from polars import col, Expr, lit
 
 from glacier.types import PythonType

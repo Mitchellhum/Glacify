@@ -1,5 +1,6 @@
 from functools import partial
 from typing import Optional
+
 from polars import when, col, lit, Expr
 
 from glacier.types import PythonType
