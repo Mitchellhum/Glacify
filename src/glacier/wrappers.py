@@ -4,16 +4,16 @@ from typing import Callable, Optional
 def validator(selection: Optional[list[str]] = None) -> Callable:
     """
     Wraps a function that returns a validation expression. All wrapped functions
-    are expected to receive at least 1 argument, which would be the column name. 
+    are expected to receive at least 1 argument, which would be the column name.
     Wrapped functions are expected to return 2 arguments: a filter Expression
-    that would be valid polars, and an error which is shown whenever the filter 
+    that would be valid polars, and an error which is shown whenever the filter
     is true for a row.
 
     Parameters
     ----------
     selection : Optional[list[str]]
         A list of all columns on which this validation expression needs to be
-        executed. By default None, which would mean all columns get checked by this 
+        executed. By default None, which would mean all columns get checked by this
         expression.
 
     Returns

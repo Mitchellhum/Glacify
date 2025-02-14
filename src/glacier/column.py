@@ -13,15 +13,15 @@ from glacier.validators import get_validators
 @dataclass(repr=False, eq=False, match_args=False)
 class Column:
     name: str
-    is_identifier: Optional[bool] = False
-    nullable: Optional[bool] = True
+    is_identifier: bool = False
+    nullable: bool = True
+    allow_duplicates: bool = True
     default: Optional[PythonType] = None
     min_length: Optional[int] = None
     max_length: Optional[int] = None
     lower_than: Optional[int | float | date | datetime] = None
     greater_than: Optional[int | float | date | datetime] = None
     equal_to: Optional[PythonType] = None
-    allow_duplicates: Optional[bool] = True
     _type: Optional[PolarsType] = None
     _setters: list[Expr] = field(default_factory=lambda: [])
     _validators: list[partial] = field(default_factory=lambda: [])
