@@ -25,6 +25,36 @@ def validator(selection: Optional[list[str]] = None) -> Callable:
     ------
     TypeError
         Raised when 'selection' is not a valid list with strings.
+
+
+    Examples
+    --------
+    ```python
+    from polars import Expr, col, lit
+    from glacier import ValidationBase, Column, validator
+
+    class ExampleValidator(ValidationBase):
+        id: int = Column(name="Index")
+        first_name: str = Column(name="First Name")
+        last_name: str = Column(name="Last Name")
+        address: str = Column(name="Address")
+        gross_income: float = Column(name="Gross-Income")
+
+        @validator(selection=["First Name", "Last Name"])
+        def check_is_alphabetic(column: str) -> tuple[Expr, str]:
+            # Anything that is not alphabetic needs to receive the error
+            expression = col(column).str.contains(pattern="/^[A-Za-z]+$/").not_()
+            error = f"{column} can only contain alphabetic characters!"
+
+            return expression, error
+        
+        @validator(selection=["Gross-Income"])
+        def check_not_negative(column: str) -> tuple[Expr, str]:
+            expression = col(column).lt(lit(0.0))
+            error = f"{column} cannot be lower than 0!"
+
+            return expression, error
+    ```
     """
     type_error = "Argument 'selection' expects a list of strings representing the column names needed for executing the validation check!"
 
