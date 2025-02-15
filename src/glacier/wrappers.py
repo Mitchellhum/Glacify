@@ -34,6 +34,7 @@ def validator(selection: Optional[list[str]] = None) -> Callable:
     from glacier import ValidationBase, Column, validator
 
     class ExampleValidator(ValidationBase):
+        settings = ValidationSettings(strict=False)
         id: int = Column(name="Index")
         first_name: str = Column(name="First Name")
         last_name: str = Column(name="Last Name")
@@ -47,7 +48,7 @@ def validator(selection: Optional[list[str]] = None) -> Callable:
             error = f"{column} can only contain alphabetic characters!"
 
             return expression, error
-        
+
         @validator(selection=["Gross-Income"])
         def check_not_negative(column: str) -> tuple[Expr, str]:
             expression = col(column).lt(lit(0.0))

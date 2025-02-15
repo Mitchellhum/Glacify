@@ -5,10 +5,10 @@ name = "pypi"
 
 [packages]
 polars = "==1.22.0"
-twine = "*"
 
 [dev-packages]
 black = "*"
+twine = "*"
 
 [requires]
 python_version = "3.11"
