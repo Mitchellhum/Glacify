@@ -9,6 +9,7 @@ polars = "==1.22.0"
 [dev-packages]
 black = "*"
 twine = "*"
+sphinx = "*"
 
 [requires]
 python_version = "3.11"
