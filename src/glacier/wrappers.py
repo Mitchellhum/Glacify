@@ -14,7 +14,7 @@ def _validate_inner_type(selection: list[str], error: str) -> None:
         if not isinstance(column, str):
             raise TypeError(error)
 
-def _validate_type(selection: list, error: str) -> None:
+def _validate_outer_type(selection: list, error: str) -> None:
     """
     Validates whether the user selection is actually a list and not a single item.
 
@@ -88,7 +88,7 @@ def validator(selection: Optional[list[str]] = None) -> Callable:
         selection = ["*"]
 
     # Lets make sure that the user actually inputted a list...
-    _validate_type(selection=selection, error=type_error)
+    _validate_outer_type(selection=selection, error=type_error)
 
     # We also have to make sure that the values are string too
     _validate_inner_type(selection=selection, error=type_error)
