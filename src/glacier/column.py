@@ -12,6 +12,53 @@ from glacier.validators import get_validators
 
 @dataclass(repr=False, eq=False, match_args=False)
 class Column:
+    """
+    Represents a column inside a dataframe. Expects at least the full column name as argument ('name').
+    A Column contains basic/default validators so that the user does not have to define any of those.
+    For example, the argument 'min_length' will add a validation expression to the list of validators,
+    which will then check this column for a certain length. Will only work if the validator is applicable
+    on the annotated python type for this column.
+
+    Attributes
+    ----------
+    name : str
+        Name of the column that this Column object represents.
+    is_identifier : bool
+        This column can be used as identifier for each row/error.
+    nullable : bool
+        Column can contain nullable values. By default true.
+    allow_duplicates : bool
+        Column allows duplicates to exist. By default True.
+    default : Optional[PythonType]
+        Replaces all null values with the default value. Be sure to have the same type for the default value
+        just like the annotated type for the column. 
+    min_length : Optional[int]
+        Sets the minimal length of iteratable column types, such as strings and lists.
+    max_length : Optional[int]
+        Sets the maximal length of iteratable column types, such as strings and lists.
+    lower_than : Optional[int | float | date | datetime]
+        All values inside the column must be lower than the assigned value.
+    greater_than : Optional[int | float | date | datetime]
+        All values inside the column must be greater than the assigned value.
+    equal_to : Optional[PythonType]
+        All values inside the column must be equal to the assigned value.
+
+    Examples
+    --------
+    >>> from polars import Expr, col, lit
+    >>> from glacier import ValidationBase, Column, validator, ValidationSettings
+    ...
+    >>> class NewClass(ValidationBase):
+    ...    settings = ValidationSettings(strict=False)
+    ...    index: int = Column(name="Index", is_identifier=True)
+    ...    string_column: str = Column(name="String Column", equal_to="must be equal")
+    ...
+    >>> # Error:
+    >>> # The dataframe failed to pass the validation model. Below is a summary of all validation errors:
+    >>> # 1:
+    >>> #     String Column must be equal to 'must be equal'!
+    """
+
     name: str
     is_identifier: bool = False
     nullable: bool = True
@@ -22,10 +69,12 @@ class Column:
     lower_than: Optional[int | float | date | datetime] = None
     greater_than: Optional[int | float | date | datetime] = None
     equal_to: Optional[PythonType] = None
-    _type: Optional[PolarsType] = None
-    _setters: list[Expr] = field(default_factory=lambda: [])
-    _validators: list[partial] = field(default_factory=lambda: [])
-    _model_validators: list[partial] = field(default_factory=lambda: [])
+    
+    # Private Fields
+    _type: Optional[PolarsType] = field(default=None, init=False)
+    _setters: list[Expr] = field(default_factory=lambda: [], init=False)
+    _validators: list[partial] = field(default_factory=lambda: [], init=False)
+    _model_validators: list[partial] = field(default_factory=lambda: [], init=False)
 
     def _resolve_polars_type(self, type_: PythonType) -> None:
         """
