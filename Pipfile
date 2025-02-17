@@ -9,6 +9,7 @@ polars = "==1.22.0"
 [dev-packages]
 black = "*"
 twine = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.11"
