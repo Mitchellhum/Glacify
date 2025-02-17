@@ -1,4 +1,4 @@
-from contextlib import contextmanager, nullcontext
+from contextlib import nullcontext
 import pytest
 
 from glacier.wrappers import _validate_inner_type, _validate_outer_type, validator
