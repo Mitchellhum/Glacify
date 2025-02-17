@@ -1,6 +1,31 @@
 from typing import Callable, Optional
 
 
+def _validate_inner_type(selection: list[str], error: str) -> None:
+    """
+    Validates the inner type of the list as string values.
+
+    Raises
+    ------
+    TypeError
+        Raised whenever the inner type is not a string.
+    """
+    for column in selection:
+        if not isinstance(column, str):
+            raise TypeError(error)
+
+def _validate_type(selection: list, error: str) -> None:
+    """
+    Validates whether the user selection is actually a list and not a single item.
+
+    Raises
+    ------
+    TypeError
+        Raised whenever it is not a list.
+    """
+    if not isinstance(selection, list):
+        raise TypeError(error)
+
 def validator(selection: Optional[list[str]] = None) -> Callable:
     """
     Wraps a function that returns a validation expression. All wrapped functions
@@ -63,13 +88,10 @@ def validator(selection: Optional[list[str]] = None) -> Callable:
         selection = ["*"]
 
     # Lets make sure that the user actually inputted a list...
-    if not isinstance(selection, list):
-        raise TypeError(type_error)
+    _validate_type(selection=selection, error=type_error)
 
     # We also have to make sure that the values are string too
-    for column in selection:
-        if not isinstance(column, str):
-            raise TypeError(type_error)
+    _validate_inner_type(selection=selection, error=type_error)
 
     # Set the validation check identifiers, so that the metaclass knows what to do
     def inner(function: Callable) -> Callable:
