@@ -35,7 +35,7 @@ jobs:
 
       - name: Build Sphinx documentation
         run: |
-          sphinx-build doc gh-pages/_build
+          sphinx-build doc _build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -43,4 +43,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: gh-pages
+          publish_dir: _build
+          force-orphan: true
