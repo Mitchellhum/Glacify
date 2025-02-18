@@ -11,31 +11,23 @@ jobs:
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          ref: main
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
           pip install sphinx
+          pip install -r requirements.txt  # Install project dependencies
 
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages
-
-      - name: Copy main branch content to gh-pages
-        run: |
-          rsync -av --exclude='.git' --exclude='gh-pages' ./ gh-pages/
-          cd gh-pages
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add .
-          git commit -m "Sync main branch with gh-pages" || echo "No changes to commit"
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/src" >> $GITHUB_ENV
+        # Ensures the 'src' directory is discoverable by Python
 
       - name: Build Sphinx documentation
-        run: |
-          sphinx-build doc _build
+        run: sphinx-build doc _build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -43,5 +35,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: _build
-          force-orphan: true
+          publish_dir: _build/
+          force_orphan: true
