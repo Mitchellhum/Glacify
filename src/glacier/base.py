@@ -1,26 +1,69 @@
 from collections import defaultdict
 from typing import Optional
 
-import polars.selectors as cs
 from polars import DataFrame, col, concat_list, concat_str
 from polars.exceptions import PolarsError
+from polars.selectors import contains
 
-from glacier.meta import ValidationMetaClass
 from glacier.exceptions import GlacierValidationException, GlacierCriticalException
+from glacier.meta import ValidationMetaClass
+from glacier.settings import ValidationSettings
 
 
 class ValidationBase(metaclass=ValidationMetaClass):
+    """
+    Base class that is used to define a validator class. The idea of the class is to improve
+    readability of validation code for polars dataframes, while still integrating properly with
+    other pipelines, such as excel file validations.
+
+    Attributes
+    ----------
+    settings : ValidationSettings
+        Allows a custom definition of all model-wide settings. Uses all default values is not set
+        by the user.
+
+    Examples
+    --------
+    >>> from polars import Expr, col, lit
+    >>> from glacier import ValidationBase, Column, validator, ValidationSettings
+    ...
+    >>> class ExampleValidator(ValidationBase):
+    ...    settings = ValidationSettings(strict=False)
+    ...    id: int = Column(name="Index")
+    ...    first_name: str = Column(name="First Name")
+    ...    last_name: str = Column(name="Last Name")
+    ...    address: str = Column(name="Address")
+    ...    gross_income: float = Column(name="Gross-Income")
+    ...
+    ...    @validation_check(selection=["First Name", "Last Name"])
+    ...    def check_is_alphabetic(column: str) -> tuple[Expr, str]:
+    ...        # Anything that is not alphabetic needs to receive the error
+    ...        expression = col(column).str.contains(pattern="/^[A-Za-z]+$/").not_()
+    ...        error = f"{column} can only contain alphabetic characters!"
+    ...
+    ...        return expression, error
+    ...
+    ...    @validation_check(selection=["Gross-Income"])
+    ...    def check_not_negative(column: str) -> tuple[Expr, str]:
+    ...        expression = col(column).lt(lit(0.0))
+    ...        error = f"{column} cannot be lower than 0!"
+    ...
+    ...        return expression, error
+    """
+
+    settings = ValidationSettings()
+
     def __init__(
-        self,
-        dataframe: Optional[DataFrame] = None,
-        strict_dtypes: bool = True,
+        self, dataframe: Optional[DataFrame] = None, strict: Optional[bool] = None
     ) -> None:
         self._dataframe = dataframe
-        self._strict_dtypes = strict_dtypes
         self._error_inner = defaultdict(list)
 
+        if strict is not None:
+            self.settings = ValidationSettings(strict=strict)
+
         # A shortcut
-        if dataframe:
+        if dataframe is not None:
             self.validate(dataframe=dataframe)
 
     def _dataframe_as_error(self) -> None:
@@ -34,7 +77,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
         GlacierValidationException
             Raised whenever errors are found during validation.
         """
-        if "__error_" not in self._dataframe.columns:
+        if not any("__error_" in column for column in self._dataframe.columns):
             return
 
         try:
@@ -45,7 +88,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
                         concat_str(self._identifier_columns, separator="_").alias(
                             "identifier"
                         ),
-                        concat_list(cs.contains("__error_"))
+                        concat_list(contains("__error_"))
                         .list.drop_nulls()
                         .alias("errors"),
                     ]
@@ -58,6 +101,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
                 "Failed to execute error transformation"
             ) from error
 
+        print(self._dataframe)
         if dataframe.is_empty():
             return
 
@@ -96,7 +140,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
         """
         try:
             expressions = [
-                col(column).cast(dtype=dtype, strict=self._strict_dtypes).name.keep()
+                col(column).cast(dtype=dtype, strict=self.settings.strict).name.keep()
                 for column, dtype in self._dataframe_schema.items()
             ]
             self._dataframe = self._dataframe.lazy().with_columns(expressions).collect()
@@ -146,7 +190,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
 
     def validate(self, dataframe: DataFrame) -> None:
         """
-        Validates a dataframe against the default and user defined validation checks.
+        Validates a dataframe against default and user defined validation checks.
 
         Parameters
         ----------
@@ -169,7 +213,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
         self._execute_validators()
         self._dataframe_as_error()
 
-    def dump_dataframe(self) -> DataFrame:
+    def dump(self) -> DataFrame:
         """
         Returns the current state of the dataframe.
 

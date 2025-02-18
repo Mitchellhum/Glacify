@@ -1,8 +1,27 @@
 class GlacierCriticalException(Exception):
+    """
+    Occurs whenever the glacier validation model runs in to an error
+    that prevents the model from validating the dataframe. Often, these 
+    errors are caused by bugs/unexpected behaviour and should be reported
+    to the Glacier github page.
+    """
     pass
 
 
 class GlacierValidationException(Exception):
+    """
+    The main error thrown by the validation model. A regular occurence, as this would
+    mean that the validation model is doing a good job.
+
+    Examples
+    --------
+    >>> # The dataframe failed to pass the validation model. Below is a summary of all validation errors:
+    >>> # Row 1:
+    >>> #     String Column must be equal to 'must be equal'!
+    >>> #
+    >>> # Row 2:
+    >>> #     Integer Column must be greater than 0!
+    """
     def __init__(self, inner: dict[str, list]) -> None:
         self._inner = inner
         self.message = self._inner_as_string()
