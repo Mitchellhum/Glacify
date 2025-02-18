@@ -9,19 +9,24 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
       - name: Install dependencies
         run: |
-          pip install sphinx
-      - name: Sphinx build
+          pip install sphinx sphinx_rtd_theme myst_parser
+
+      - name: Build Sphinx documentation
         run: |
           sphinx-build doc _build
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         with:
-          publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
           publish_dir: _build/
-          keep_files: true
+          force_orphan: true 
