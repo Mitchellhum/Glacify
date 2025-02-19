@@ -10,6 +10,8 @@ polars = "==1.22.0"
 black = "*"
 twine = "*"
 pytest = "*"
+sphinx = "*"
+
 
 [requires]
 python_version = "3.11"

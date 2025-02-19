@@ -1,7 +1,7 @@
 from contextlib import nullcontext
 import pytest
 
-from glacier.wrappers import _validate_inner_type, _validate_outer_type, validator
+from glacier.wrappers import _validate_inner_type, _validate_outer_type, validation_check
 
 type_error = "Argument 'selection' expects a list of strings representing the column names needed for executing the validation check!"
 
@@ -93,7 +93,7 @@ def test_inner_type_validator(selection, raises, error_message):
     ],
 )
 def test_wrapper_init(selection, outcome):
-    @validator(selection=selection)
+    @validation_check(selection=selection)
     def inner_function():
         pass
 
@@ -142,7 +142,7 @@ def test_wrapper_init(selection, outcome):
 def test_wrapper_integration(selection, raises, outcome):
     with raises as raised_error:
 
-        @validator(selection=selection)
+        @validation_check(selection=selection)
         def inner_function():
             pass
 

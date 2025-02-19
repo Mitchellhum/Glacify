@@ -19,22 +19,44 @@ class Column:
     which will then check this column for a certain length. Will only work if the validator is applicable
     on the annotated python type for this column.
 
-    Examples:
-    ---------
-    ```python
-    from polars import Expr, col, lit
-    from glacier import ValidationBase, Column, validator
+    Attributes
+    ----------
+    name : str
+        Name of the column that this Column object represents.
+    is_identifier : bool
+        This column can be used as identifier for each row/error.
+    nullable : bool
+        Column can contain nullable values. By default true.
+    allow_duplicates : bool
+        Column allows duplicates to exist. By default True.
+    default : Optional[PythonType]
+        Replaces all null values with the default value. Be sure to have the same type for the default value
+        just like the annotated type for the column. 
+    min_length : Optional[int]
+        Sets the minimal length of iteratable column types, such as strings and lists.
+    max_length : Optional[int]
+        Sets the maximal length of iteratable column types, such as strings and lists.
+    lower_than : Optional[int | float | date | datetime]
+        All values inside the column must be lower than the assigned value.
+    greater_than : Optional[int | float | date | datetime]
+        All values inside the column must be greater than the assigned value.
+    equal_to : Optional[PythonType]
+        All values inside the column must be equal to the assigned value.
 
-    class NewClass(ValidationBase):
-        settings = ValidationSettings(strict=False)
-        index: int = Column(name="Index", is_identifier=True)
-        string_column: str = Column(name="String Column", equal_to="must be equal")
-
-    # Error:
-    # The dataframe failed to pass the validation model. Below is a summary of all validation errors:
-    # 1:
-    #     String Column must be equal to 'must be equal'!
-    ```
+    Examples
+    --------
+    >>> from polars import Expr, col, lit
+    >>> from glacier import ValidationBase, Column, validator, ValidationSettings
+    ...
+    >>> class NewClass(ValidationBase):
+    ...    settings = ValidationSettings(strict=False)
+    ...    index: int = Column(name="Index", is_identifier=True)
+    ...    string_column: str = Column(name="String Column", equal_to="must be equal")
+    ...
+    >>> # Error:
+    >>> # The dataframe failed to pass the validation model. Below is a summary of all validation errors:
+    >>> # 1:
+    >>> #     String Column must be equal to 'must be equal'!
     """
 
     name: str

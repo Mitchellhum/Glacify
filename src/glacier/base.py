@@ -16,35 +16,39 @@ class ValidationBase(metaclass=ValidationMetaClass):
     readability of validation code for polars dataframes, while still integrating properly with
     other pipelines, such as excel file validations.
 
+    Attributes
+    ----------
+    settings : ValidationSettings
+        Allows a custom definition of all model-wide settings. Uses all default values is not set
+        by the user.
+
     Examples
     --------
-    ```python
-    from polars import Expr, col, lit
-    from glacier import ValidationBase, Column, validator
-
-    class ExampleValidator(ValidationBase):
-        settings = ValidationSettings(strict=False)
-        id: int = Column(name="Index")
-        first_name: str = Column(name="First Name")
-        last_name: str = Column(name="Last Name")
-        address: str = Column(name="Address")
-        gross_income: float = Column(name="Gross-Income")
-
-        @validator(selection=["First Name", "Last Name"])
-        def check_is_alphabetic(column: str) -> tuple[Expr, str]:
-            # Anything that is not alphabetic needs to receive the error
-            expression = col(column).str.contains(pattern="/^[A-Za-z]+$/").not_()
-            error = f"{column} can only contain alphabetic characters!"
-
-            return expression, error
-
-        @validator(selection=["Gross-Income"])
-        def check_not_negative(column: str) -> tuple[Expr, str]:
-            expression = col(column).lt(lit(0.0))
-            error = f"{column} cannot be lower than 0!"
-
-            return expression, error
-    ```
+    >>> from polars import Expr, col, lit
+    >>> from glacier import ValidationBase, Column, validator, ValidationSettings
+    ...
+    >>> class ExampleValidator(ValidationBase):
+    ...    settings = ValidationSettings(strict=False)
+    ...    id: int = Column(name="Index")
+    ...    first_name: str = Column(name="First Name")
+    ...    last_name: str = Column(name="Last Name")
+    ...    address: str = Column(name="Address")
+    ...    gross_income: float = Column(name="Gross-Income")
+    ...
+    ...    @validation_check(selection=["First Name", "Last Name"])
+    ...    def check_is_alphabetic(column: str) -> tuple[Expr, str]:
+    ...        # Anything that is not alphabetic needs to receive the error
+    ...        expression = col(column).str.contains(pattern="/^[A-Za-z]+$/").not_()
+    ...        error = f"{column} can only contain alphabetic characters!"
+    ...
+    ...        return expression, error
+    ...
+    ...    @validation_check(selection=["Gross-Income"])
+    ...    def check_not_negative(column: str) -> tuple[Expr, str]:
+    ...        expression = col(column).lt(lit(0.0))
+    ...        error = f"{column} cannot be lower than 0!"
+    ...
+    ...        return expression, error
     """
 
     settings = ValidationSettings()
@@ -209,7 +213,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
         self._execute_validators()
         self._dataframe_as_error()
 
-    def dump_dataframe(self) -> DataFrame:
+    def dump(self) -> DataFrame:
         """
         Returns the current state of the dataframe.
 
