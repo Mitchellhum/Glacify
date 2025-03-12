@@ -51,8 +51,6 @@ class ValidationBase(metaclass=ValidationMetaClass):
     ...        return expression, error
     """
 
-    settings = ValidationSettings()
-
     def __init__(
         self, dataframe: Optional[DataFrame] = None, strict: Optional[bool] = None
     ) -> None:
@@ -60,19 +58,11 @@ class ValidationBase(metaclass=ValidationMetaClass):
         self._error_inner = defaultdict(list)
 
         if strict is not None:
-            self.settings = ValidationSettings(strict=strict)
+            self.settings.strict = strict
 
         # A shortcut
         if dataframe is not None:
             self.validate(dataframe=dataframe)
-
-    def _validate_identifiers(self) -> None:
-        """
-        Checks whether any identifiers exist, otherwise adds a row index as identifier.
-        """
-        if not self._identifier_columns:
-            self._dataframe = self._dataframe.with_row_index(name="__index", offset=1)
-            self._identifier_columns.append("__index")
 
     def _dataframe_as_error(self) -> None:
         """
@@ -166,9 +156,12 @@ class ValidationBase(metaclass=ValidationMetaClass):
             Raised whenever Polars fails to execute the column expressions.
         """
         try:
-            self._dataframe = (
-                self._dataframe.lazy().with_columns(self._setter_expressions).collect()
-            )
+            lazyframe = self._dataframe.lazy()
+
+            for setter in self._setter_expressions:
+                lazyframe = lazyframe.with_columns(setter)
+            
+            self._dataframe = lazyframe.collect()
         except PolarsError as error:
             raise GlacierCriticalException(
                 "Failed to execute setter expressions"
@@ -194,6 +187,14 @@ class ValidationBase(metaclass=ValidationMetaClass):
             raise GlacierCriticalException(
                 f"Cannot find the following columns inside the dataframe, are the columns spelled correctly? '{missing_columns}'"
             )
+    
+    def _validate_identifiers(self) -> None:
+        """
+        Checks whether any identifiers exist, otherwise adds a row index as identifier.
+        """
+        if not self._identifier_columns:
+            self._dataframe = self._dataframe.with_row_index(name="__index", offset=1)
+            self._identifier_columns.append("__index")
 
     def validate(self, dataframe: DataFrame) -> None:
         """
