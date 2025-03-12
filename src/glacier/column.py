@@ -36,10 +36,14 @@ class Column:
         Sets the minimal length of iteratable column types, such as strings and lists.
     max_length : Optional[int]
         Sets the maximal length of iteratable column types, such as strings and lists.
-    lower_than : Optional[int | float | date | datetime]
+    lt : Optional[int | float | date | datetime]
         All values inside the column must be lower than the assigned value.
-    greater_than : Optional[int | float | date | datetime]
+    gt : Optional[int | float | date | datetime]
         All values inside the column must be greater than the assigned value.
+    le : Optional[int | float | date | datetime]
+        All values inside the column must be lower than or equal to the assigned value.
+    ge : Optional[int | float | date | datetime]
+        All values inside the column must be greater than or equal to the assigned value.
     equal_to : Optional[PythonType]
         All values inside the column must be equal to the assigned value.
 
@@ -61,14 +65,16 @@ class Column:
 
     name: str
     is_identifier: bool = False
-    nullable: bool = True
-    allow_duplicates: bool = True
-    default: Optional[PythonType] = None
+    nullable: bool = True #
+    allow_duplicates: bool = True #
+    default: Optional[PythonType] = None #
     min_length: Optional[int] = None
     max_length: Optional[int] = None
-    lower_than: Optional[int | float | date | datetime] = None
-    greater_than: Optional[int | float | date | datetime] = None
-    equal_to: Optional[PythonType] = None
+    lt: Optional[int | float | date | datetime] = None
+    gt: Optional[int | float | date | datetime] = None
+    le: Optional[int | float | date | datetime] = None
+    ge: Optional[int | float | date | datetime] = None
+    equal_to: Optional[PythonType] = None #
     
     # Private Fields
     _type: Optional[PolarsType] = field(default=None, init=False)
@@ -113,6 +119,11 @@ class Column:
             equal_to=self.equal_to,
             allow_duplicates=self.allow_duplicates,
             min_length=self.min_length,
+            max_length=self.max_length,
+            lt=self.lt,
+            gt=self.gt,
+            le=self.le,
+            ge=self.ge,
             type_=type_,
         )
 

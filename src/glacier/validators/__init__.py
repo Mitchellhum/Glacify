@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from functools import partial
 from typing import Optional
 
@@ -12,6 +13,11 @@ def get_validators(
     equal_to: Optional[PythonType],
     allow_duplicates: Optional[bool],
     min_length: Optional[int],
+    max_length: Optional[int],
+    lt: Optional[int | float | date | datetime],
+    gt: Optional[int | float | date | datetime],
+    le: Optional[int | float | date | datetime],
+    ge: Optional[int | float | date | datetime],
     type_: PythonType,
 ) -> list[partial]:
     validators = []
@@ -26,6 +32,6 @@ def get_validators(
     )
 
     if type_ is str:
-        validators.extend(get_string_validators(column=column, min_length=min_length))
+        validators.extend(get_string_validators(column=column, min_length=min_length, max_length=max_length))
 
     return validators
