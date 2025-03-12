@@ -4,6 +4,7 @@ from typing import Optional
 
 from glacier.types import PythonType
 from glacier.validators.general import get_general_validators
+from glacier.validators.numeric import get_numeric_validators
 from glacier.validators.string import get_string_validators
 
 
@@ -33,5 +34,11 @@ def get_validators(
 
     if type_ is str:
         validators.extend(get_string_validators(column=column, min_length=min_length, max_length=max_length))
+
+    elif type_ is int:
+        validators.extend(get_numeric_validators(column=column, lt=lt, gt=gt, le=le, ge=ge))
+    
+    elif type_ is float:
+        validators.extend(get_numeric_validators(column=column, lt=lt, gt=gt, le=le, ge=ge))
 
     return validators
