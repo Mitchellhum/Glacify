@@ -3,6 +3,7 @@ from functools import partial
 from typing import Optional
 
 from glacier.types import PythonType
+from glacier.validators.date import get_date_validators
 from glacier.validators.general import get_general_validators
 from glacier.validators.numeric import get_numeric_validators
 from glacier.validators.string import get_string_validators
@@ -40,5 +41,11 @@ def get_validators(
     
     elif type_ is float:
         validators.extend(get_numeric_validators(column=column, lt=lt, gt=gt, le=le, ge=ge))
+    
+    elif type_ is date:
+        validators.extend(get_date_validators(column=column, lt=lt, gt=gt, le=le, ge=ge))
+    
+    elif type_ is datetime:
+        validators.extend(get_date_validators(column=column, lt=lt, gt=gt, le=le, ge=ge))
 
     return validators
