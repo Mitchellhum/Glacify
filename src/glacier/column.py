@@ -31,7 +31,11 @@ class Column:
         Column allows duplicates to exist. By default True.
     default : Optional[PythonType]
         Replaces all null values with the default value. Be sure to have the same type for the default value
-        just like the annotated type for the column. 
+        just like the annotated type for the column.
+    format : Optional[str]
+        Format used to transform date field from strings. Whenever a date/datetime field is found,
+        all values are transformed in to Polars dates via this format. If None, will use Polars'
+        native default value.
     min_length : Optional[int]
         Sets the minimal length of iteratable column types, such as strings and lists.
     max_length : Optional[int]
@@ -65,17 +69,18 @@ class Column:
 
     name: str
     is_identifier: bool = False
-    nullable: bool = True #
-    allow_duplicates: bool = True #
-    default: Optional[PythonType] = None #
+    nullable: bool = True
+    allow_duplicates: bool = True
+    default: Optional[PythonType] = None
+    format: Optional[str] = None
     min_length: Optional[int] = None
     max_length: Optional[int] = None
     lt: Optional[int | float | date | datetime] = None
     gt: Optional[int | float | date | datetime] = None
     le: Optional[int | float | date | datetime] = None
     ge: Optional[int | float | date | datetime] = None
-    equal_to: Optional[PythonType] = None #
-    
+    equal_to: Optional[PythonType] = None
+
     # Private Fields
     _type: Optional[PolarsType] = field(default=None, init=False)
     _setters: list[Expr] = field(default_factory=lambda: [], init=False)
@@ -112,7 +117,9 @@ class Column:
             Type that is used as attribute annotation inside the model.
         """
         self._type = self._resolve_polars_type(type_=type_)
-        self._setters = get_setters(column=self.name, type_=type_, default=self.default)
+        self._setters = get_setters(
+            column=self.name, type_=type_, default=self.default, format=self.format
+        )
         self._validators = get_validators(
             column=self.name,
             nullable=self.nullable,

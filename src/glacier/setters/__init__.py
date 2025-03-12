@@ -9,16 +9,16 @@ from glacier.types import PythonType
 
 
 def get_setters(
-    column: str, type_: PythonType, default: Optional[PythonType]
+    column: str, type_: PythonType, default: Optional[PythonType], format: Optional[str]
 ) -> list[Expr]:
     setters = []
 
     setters.extend(get_general_setters(column=column, default=default, type_=type_))
 
     if type_ is date:
-        setters.extend(get_date_setters(column=column))
+        setters.extend(get_date_setters(column=column, format=format))
 
     elif type_ is datetime:
-        setters.extend(get_datetime_setters(column=column))
+        setters.extend(get_datetime_setters(column=column, format=format))
 
     return setters
