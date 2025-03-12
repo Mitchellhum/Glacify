@@ -66,6 +66,14 @@ class ValidationBase(metaclass=ValidationMetaClass):
         if dataframe is not None:
             self.validate(dataframe=dataframe)
 
+    def _validate_identifiers(self) -> None:
+        """
+        Checks whether any identifiers exist, otherwise adds a row index as identifier.
+        """
+        if not self._identifier_columns:
+            self._dataframe = self._dataframe.with_row_index(name="__index", offset=1)
+            self._identifier_columns.append("__index")
+
     def _dataframe_as_error(self) -> None:
         """
         Transforms all new error columns in to a readable error message for the user.
@@ -101,7 +109,6 @@ class ValidationBase(metaclass=ValidationMetaClass):
                 "Failed to execute error transformation"
             ) from error
 
-        print(self._dataframe)
         if dataframe.is_empty():
             return
 
@@ -207,6 +214,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
         self._dataframe = dataframe
         self._error_inner = defaultdict(list)
 
+        self._validate_identifiers()
         self._validate_columns()
         self._execute_setters()
         self._execute_dtype_transformation()
