@@ -15,7 +15,7 @@ def check_min_length(column: str, length: int, index: int) -> Expr:
 def check_max_length(column: str, length: int, index: int) -> Expr:
     return (
         when(col(column).str.len_chars().gt(lit(length)))
-        .then(lit(f"{column} requires a maximal length of {length} characters."))
+        .then(lit(f"{column} has a maximal length of {length} characters."))
         .alias(f"__error_{index}")
     )
 
@@ -26,9 +26,9 @@ def get_string_validators(
     validators = []
 
     if min_length:
-        validators.append(partial(check_min_length, column=column))
+        validators.append(partial(check_min_length, column=column, length=min_length))
 
     if max_length:
-        validators.append(partial(check_max_length, column=column))
+        validators.append(partial(check_max_length, column=column, length=max_length))
 
     return validators
