@@ -34,18 +34,30 @@ def get_validators(
     )
 
     if type_ is str:
-        validators.extend(get_string_validators(column=column, min_length=min_length, max_length=max_length))
+        validators.extend(
+            get_string_validators(
+                column=column, min_length=min_length, max_length=max_length
+            )
+        )
 
     elif type_ is int:
-        validators.extend(get_numeric_validators(column=column, lt=lt, gt=gt, le=le, ge=ge))
-    
+        validators.extend(
+            get_numeric_validators(column=column, lt=lt, gt=gt, le=le, ge=ge)
+        )
+
     elif type_ is float:
-        validators.extend(get_numeric_validators(column=column, lt=lt, gt=gt, le=le, ge=ge))
-    
+        validators.extend(
+            get_numeric_validators(column=column, lt=lt, gt=gt, le=le, ge=ge)
+        )
+
     elif type_ is date:
-        validators.extend(get_date_validators(column=column, lt=lt, gt=gt, le=le, ge=ge))
-    
+        validators.extend(
+            get_date_validators(column=column, lt=lt, gt=gt, le=le, ge=ge)
+        )
+
     elif type_ is datetime:
-        validators.extend(get_date_validators(column=column, lt=lt, gt=gt, le=le, ge=ge))
+        validators.extend(
+            get_date_validators(column=column, lt=lt, gt=gt, le=le, ge=ge)
+        )
 
     return validators

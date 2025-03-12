@@ -1,10 +1,11 @@
 class GlacierCriticalException(Exception):
     """
     Occurs whenever the glacier validation model runs in to an error
-    that prevents the model from validating the dataframe. Often, these 
+    that prevents the model from validating the dataframe. Often, these
     errors are caused by bugs/unexpected behaviour and should be reported
     to the Glacier github page.
     """
+
     pass
 
 
@@ -22,6 +23,7 @@ class GlacierValidationException(Exception):
     >>> # Row 2:
     >>> #     Integer Column must be greater than 0!
     """
+
     def __init__(self, inner: dict[str, list]) -> None:
         self._inner = inner
         self.message = self._inner_as_string()
