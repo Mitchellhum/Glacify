@@ -99,6 +99,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
                 "Failed to execute error transformation"
             ) from error
 
+        print(self._dataframe)
         if dataframe.is_empty():
             return
 

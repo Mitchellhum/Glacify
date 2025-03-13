@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 import sys
 
-base_path = Path(__file__).parent.parent
+base_path = Path(__file__).parent.parent.parent
 path = base_path / 'src'
 sys.path.insert(0, os.path.abspath(path))
 
