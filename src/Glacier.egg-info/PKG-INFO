@@ -1,6 +1,6 @@
 Metadata-Version: 2.2
 Name: Glacier
-Version: 0.1.0
+Version: 0.3.0
 Summary: A Dataframe validation package for Polars
 Author-email: Mitchell Hummel <mustbemitchell@gmail.com>
 License: MIT License
