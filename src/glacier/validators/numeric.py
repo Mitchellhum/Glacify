@@ -46,7 +46,7 @@ def get_numeric_validators(
     validators = []
 
     for value in (lt, gt, le, ge):
-        if not value:
+        if value is None:
             continue
 
         if not isinstance(value, int) and not isinstance(value, float):
