@@ -5,10 +5,12 @@ from typing import Callable, Generator
 from polars import Expr, lit, when
 
 from glacier.column import Column
+from glacier.settings import ValidationSettings
 from glacier.types import PolarsType
 
 
 IGNORE_ATTRIBUTES = [
+    "settings",
     "_setter_expressions",
     "_validator_expressions",
     "_model_validator_expressions",
@@ -44,6 +46,7 @@ class ValidationMetaClass(type):
         transforms those types in to Polars types.
         """
         class_annotations = namespace.get("__annotations__", {})
+        settings = namespace.get("settings", {})
 
         for name, type_ in class_annotations.items():
             # We defined some attributes ourselves too, so ignore those
@@ -51,7 +54,7 @@ class ValidationMetaClass(type):
                 continue
 
             column: Column = namespace.get(name, Column(name=name))
-            column.resolve(type_=type_)
+            column.resolve(type_=type_, strict=settings.strict)
 
             # Multiple identifiers are allowed
             if column.is_identifier:
@@ -184,6 +187,9 @@ class ValidationMetaClass(type):
                 )
 
     def __new__(cls, name: str, bases: tuple, namespace: dict) -> "ValidationMetaClass":
+        if not namespace.get("settings"):
+            namespace.setdefault("settings", ValidationSettings())
+
         namespace.setdefault("_identifier_columns", [])
         namespace.setdefault("_setter_expressions", [])
         namespace.setdefault("_validator_expressions", [])
