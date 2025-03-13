@@ -84,7 +84,7 @@ class Column:
     le: Optional[int | float | date | datetime] = None
     ge: Optional[int | float | date | datetime] = None
     equal_to: Optional[PythonType] = None
-
+    
     # Private Fields
     _type: Optional[PolarsType] = field(default=None, init=False)
     _setters: list[Expr] = field(default_factory=lambda: [], init=False)
