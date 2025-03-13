@@ -10,7 +10,8 @@ class ValidationSettings:
     ----------
     strict : bool
         If set to true, will force data type validation for each column and throw
-        errors if the type cannot be set. If false, will set all failing cases to 
+        errors if the type cannot be set. If false, will set all failing cases to
         'null'/None. Defaults to true.
     """
+
     strict: bool = True

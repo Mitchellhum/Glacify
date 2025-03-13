@@ -31,15 +31,26 @@ class Column:
         Column allows duplicates to exist. By default True.
     default : Optional[PythonType]
         Replaces all null values with the default value. Be sure to have the same type for the default value
-        just like the annotated type for the column. 
+        just like the annotated type for the column.
+    format : Optional[str]
+        Format used to transform date field from strings. Whenever a date/datetime field is found,
+        all values are transformed in to Polars dates via this format. If None, will use Polars'
+        native default value.
+    strict : Optional[bool]
+        Determines whether the datatype is strictly set, meaning if true, any wrong datatypes will throw an error.
+        If false, any wrong datatypes will turn in to null. This parameter overwrites ValidationSettings.strict! 
     min_length : Optional[int]
         Sets the minimal length of iteratable column types, such as strings and lists.
     max_length : Optional[int]
         Sets the maximal length of iteratable column types, such as strings and lists.
-    lower_than : Optional[int | float | date | datetime]
+    lt : Optional[int | float | date | datetime]
         All values inside the column must be lower than the assigned value.
-    greater_than : Optional[int | float | date | datetime]
+    gt : Optional[int | float | date | datetime]
         All values inside the column must be greater than the assigned value.
+    le : Optional[int | float | date | datetime]
+        All values inside the column must be lower than or equal to the assigned value.
+    ge : Optional[int | float | date | datetime]
+        All values inside the column must be greater than or equal to the assigned value.
     equal_to : Optional[PythonType]
         All values inside the column must be equal to the assigned value.
 
@@ -64,12 +75,16 @@ class Column:
     nullable: bool = True
     allow_duplicates: bool = True
     default: Optional[PythonType] = None
+    format: Optional[str] = None
+    strict: Optional[bool] = None
     min_length: Optional[int] = None
     max_length: Optional[int] = None
-    lower_than: Optional[int | float | date | datetime] = None
-    greater_than: Optional[int | float | date | datetime] = None
+    lt: Optional[int | float | date | datetime] = None
+    gt: Optional[int | float | date | datetime] = None
+    le: Optional[int | float | date | datetime] = None
+    ge: Optional[int | float | date | datetime] = None
     equal_to: Optional[PythonType] = None
-    
+
     # Private Fields
     _type: Optional[PolarsType] = field(default=None, init=False)
     _setters: list[Expr] = field(default_factory=lambda: [], init=False)
@@ -96,7 +111,7 @@ class Column:
 
         return PYTHON_POLARS_TYPE_MAPPING.get(type_, String)
 
-    def resolve(self, type_: PythonType) -> None:
+    def resolve(self, type_: PythonType, strict: bool) -> None:
         """
         Resolves all types, setters and validators that are default for this column and python type.
 
@@ -106,13 +121,24 @@ class Column:
             Type that is used as attribute annotation inside the model.
         """
         self._type = self._resolve_polars_type(type_=type_)
-        self._setters = get_setters(column=self.name, type_=type_, default=self.default)
+        self._setters = get_setters(
+            column=self.name,
+            type_=type_,
+            strict=self.strict or strict,
+            default=self.default,
+            format=self.format,
+        )
         self._validators = get_validators(
             column=self.name,
             nullable=self.nullable,
             equal_to=self.equal_to,
             allow_duplicates=self.allow_duplicates,
             min_length=self.min_length,
+            max_length=self.max_length,
+            lt=self.lt,
+            gt=self.gt,
+            le=self.le,
+            ge=self.ge,
             type_=type_,
         )
 
