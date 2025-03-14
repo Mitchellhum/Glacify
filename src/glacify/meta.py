@@ -4,9 +4,9 @@ from typing import Callable, Generator
 
 from polars import Expr, lit, when
 
-from glacier.column import Column
-from glacier.settings import ValidationSettings
-from glacier.types import PolarsType
+from glacify.column import Column
+from glacify.settings import ValidationSettings
+from glacify.types import PolarsType
 
 
 IGNORE_ATTRIBUTES = [

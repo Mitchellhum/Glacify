@@ -16,10 +16,10 @@ sys.path.insert(0, os.path.abspath(path))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Glacier'
+project = 'Glacify'
 copyright = '2025, Mitchell Hummel'
 author = 'Mitchell Hummel'
-release = 'v0.2.1'
+release = 'v0.1.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

@@ -1,11 +1,11 @@
 Metadata-Version: 2.2
-Name: Glacier
+Name: Glacify
 Version: 0.1.0
 Summary: A Dataframe validation package for Polars
 Author-email: Mitchell Hummel <mustbemitchell@gmail.com>
 License: MIT License
-Project-URL: Homepage, https://github.com/Mitchellhum/glacier
-Project-URL: Issues, https://github.com/Mitchellhum/glacier/issues
+Project-URL: Homepage, https://github.com/Mitchellhum/glacify
+Project-URL: Issues, https://github.com/Mitchellhum/glacify/issues
 Classifier: Development Status :: 3 - Alpha
 Classifier: Programming Language :: Python :: 3
 Classifier: Programming Language :: Python :: 3.10
@@ -17,5 +17,5 @@ License-File: LICENSE
 Requires-Dist: polars>=1.22.0
 Requires-Dist: polars<2.0.0
 
-# Glacier
+# Glacify
 A Dataframe validation package for Polars

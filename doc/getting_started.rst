@@ -1,14 +1,14 @@
 Getting Started
 ===============
-Welcome to the quick-start guide for the Glacier dataframe validation package.
+Welcome to the quick-start guide for the Glacify dataframe validation package.
 
 Let's get started with installing the package
 
 .. code-block:: bash
 
-  > python3 -m pip install glacier
+  > python3 -m pip install glacify
 
-Glacier comes with shipped with a polars version lower than 2.0.0
+Glacify comes with shipped with a polars version lower than 2.0.0
 
 To make our model, we must first identify our dataframe layout. Let's say that we have the following CSV:
 ``> index;first name;last name;address;datetime added``
@@ -19,7 +19,7 @@ We can design our validation model as follows:
     
     from datetime import datetime
 
-    from glacier import ValidationBase, Column, ValidationSettings
+    from glacify import ValidationBase, Column, ValidationSettings
 
     class ExampleValidator(ValidationBase):
         settings = ValidationSettings(strict=True)
@@ -44,14 +44,14 @@ Afterwards, we can use this validator to validate our dataframe:
 
         new_dataframe = validator.dump()
 
-Inside the Glacier Validator, you can define your own validation checks outside of the default checks.
+Inside the Glacify Validator, you can define your own validation checks outside of the default checks.
 
 .. code-block:: python
 
     from datetime import datetime
 
     import polars as pl
-    from glacier import ValidationBase, Column, ValidationSettings, validation_check
+    from glacify import ValidationBase, Column, ValidationSettings, validation_check
 
     class ExampleValidator(ValidationBase):
         settings = ValidationSettings(strict=True)
@@ -68,7 +68,7 @@ Inside the Glacier Validator, you can define your own validation checks outside 
 
             return expression, error
 
-If the data were to have last names that are not 'Hummel', the validator will throw a GlacierValidationException,
+If the data were to have last names that are not 'Hummel', the validator will throw a GlacifyValidationException,
 which will look like this:
 
 .. code-block:: python

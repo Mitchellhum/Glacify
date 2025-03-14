@@ -1,4 +1,4 @@
-Glacier Documentation
+Glacify Documentation
 =====================
 .. toctree::
    :maxdepth: 2

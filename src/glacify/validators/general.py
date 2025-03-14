@@ -3,7 +3,7 @@ from typing import Optional
 
 from polars import when, col, lit, Expr
 
-from glacier.types import PythonType
+from glacify.types import PythonType
 
 
 def check_nullable(column: str, index: int) -> Expr:

@@ -5,9 +5,8 @@ from polars import DataFrame, col, concat_list, concat_str
 from polars.exceptions import PolarsError
 from polars.selectors import contains
 
-from glacier.exceptions import GlacierValidationException, GlacierCriticalException
-from glacier.meta import ValidationMetaClass
-from glacier.settings import ValidationSettings
+from glacify.exceptions import GlacifyValidationException, GlacifyCriticalException
+from glacify.meta import ValidationMetaClass
 
 
 class ValidationBase(metaclass=ValidationMetaClass):
@@ -25,7 +24,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
     Examples
     --------
     >>> from polars import Expr, col, lit
-    >>> from glacier import ValidationBase, Column, validator, ValidationSettings
+    >>> from glacify import ValidationBase, Column, validator, ValidationSettings
     ...
     >>> class ExampleValidator(ValidationBase):
     ...    settings = ValidationSettings(strict=False)
@@ -70,9 +69,9 @@ class ValidationBase(metaclass=ValidationMetaClass):
 
         Raises
         ------
-        GlacierCriticalException
+        GlacifyCriticalException
             Raised whenever Polars fails to execute the error expression.
-        GlacierValidationException
+        GlacifyValidationException
             Raised whenever errors are found during validation.
         """
         if not any("__error_" in column for column in self._dataframe.columns):
@@ -95,7 +94,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
                 .collect()
             )
         except PolarsError as error:
-            raise GlacierCriticalException(
+            raise GlacifyCriticalException(
                 "Failed to execute error transformation"
             ) from error
 
@@ -103,7 +102,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
             return
 
         rows_by_identifier = dataframe.rows_by_key(key=["identifier"], unique=True)
-        raise GlacierValidationException(inner=rows_by_identifier)
+        raise GlacifyValidationException(inner=rows_by_identifier)
 
     def _execute_validators(self) -> None:
         """
@@ -111,7 +110,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
 
         Raises
         ------
-        GlacierCriticalException
+        GlacifyCriticalException
             Raised whenever Polars fails to execute the validator expressions.
         """
         try:
@@ -121,7 +120,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
                 .collect()
             )
         except PolarsError as error:
-            raise GlacierCriticalException(
+            raise GlacifyCriticalException(
                 "Failed to execute validator expressions"
             ) from error
 
@@ -132,7 +131,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
 
         Raises
         ------
-        GlacierCriticalException
+        GlacifyCriticalException
             Raised whenever Polars fails to execute the cast expressions.
         """
         try:
@@ -142,7 +141,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
             ]
             self._dataframe = self._dataframe.lazy().with_columns(expressions).collect()
         except PolarsError as error:
-            raise GlacierCriticalException(
+            raise GlacifyCriticalException(
                 "Failed to execute dtype transformation: are the columns cleaned up properly?"
             ) from error
 
@@ -152,7 +151,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
 
         Raises
         ------
-        GlacierCriticalException
+        GlacifyCriticalException
             Raised whenever Polars fails to execute the column expressions.
         """
         try:
@@ -163,7 +162,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
             
             self._dataframe = lazyframe.collect()
         except PolarsError as error:
-            raise GlacierCriticalException(
+            raise GlacifyCriticalException(
                 "Failed to execute setter expressions"
             ) from error
 
@@ -173,7 +172,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
 
         Raises
         ------
-        GlacierCriticalException
+        GlacifyCriticalException
             Raised whenever missing columns are found.
         """
         current_columns = self._dataframe.columns
@@ -184,7 +183,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
         ]
 
         if missing_columns:
-            raise GlacierCriticalException(
+            raise GlacifyCriticalException(
                 f"Cannot find the following columns inside the dataframe, are the columns spelled correctly? '{missing_columns}'"
             )
     
@@ -207,7 +206,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
 
         Raises
         ------
-        GlacierValidationException
+        GlacifyValidationException
             If any validation errors show up, this exception will be thrown.
             The validation contains a list of errors, either critical or
             row-based.
