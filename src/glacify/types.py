@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from typing import Literal
 
 from polars import String, Int64, Boolean, Float64, List, Date, Datetime
 
@@ -14,3 +15,5 @@ PYTHON_POLARS_TYPE_MAPPING = {
     date: Date,
     datetime: Datetime,
 }
+
+ModeType = Literal["repeating", "model"]
