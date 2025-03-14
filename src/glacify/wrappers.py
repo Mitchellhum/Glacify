@@ -1,7 +1,11 @@
 from typing import Callable, Optional
 
+from glacify.types import ModeType
 
-def validation_check(selection: Optional[list[str]] = None) -> Callable:
+
+def validation_check(
+    selection: Optional[list[str]] = None, mode: ModeType = "repeating"
+) -> Callable:
     """
     Wraps a function that returns a validation expression. All wrapped functions
     are expected to receive at least 1 argument, which would be the column name.
@@ -15,6 +19,12 @@ def validation_check(selection: Optional[list[str]] = None) -> Callable:
         A list of all columns on which this validation expression needs to be
         executed. By default None, which would mean all columns get checked by this
         expression.
+    mode : Literal["repeating", "model"]
+        Decides the usage strategy of the validation check. 'Repeating' will execute the
+        validation check on each provided column as assigned in 'selection'. 'Repeating'
+        checks will receive the 'column_name' parameter. 'Model' will execute the
+        validation check once. NOTE: in case of the 'model' mode, be sure to still provide
+        a list of all applicable columns, as this will check whether those columns exist.
 
     Returns
     -------
@@ -68,10 +78,14 @@ def validation_check(selection: Optional[list[str]] = None) -> Callable:
         if not isinstance(column, str):
             raise TypeError(type_error)
 
+    if mode not in ("repeating", "model"):
+        raise TypeError("Function mode can only be 'repeating' or 'model'")
+
     # Set the validation check identifiers, so that the metaclass knows what to do
     def inner(function: Callable) -> Callable:
         function._is_validator = True
         function._for_columns = selection
+        function._mode = mode
         return function
 
     return inner
