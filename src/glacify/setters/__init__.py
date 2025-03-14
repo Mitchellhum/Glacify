@@ -17,7 +17,6 @@ def get_setters(
 ) -> list[Expr]:
     setters = []
 
-
     if type_ is date:
         setters.extend(get_date_setters(column=column, format=format, strict=strict))
 
