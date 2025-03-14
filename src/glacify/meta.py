@@ -45,8 +45,8 @@ class ValidationMetaClass(type):
         Checks the annotated types of the user added column attributes and
         transforms those types in to Polars types.
         """
-        class_annotations = namespace.get("__annotations__", {})
-        settings = namespace.get("settings", {})
+        class_annotations = namespace["__annotations__"]
+        settings = namespace["settings"]
 
         for name, type_ in class_annotations.items():
             # We defined some attributes ourselves too, so ignore those
@@ -112,7 +112,7 @@ class ValidationMetaClass(type):
             col for col in columns if col != "*" and col not in dataframe_columns
         ]
         if missing:
-            raise ValueError(f"Columns {missing} do not exist in the model!")
+            raise ValueError(f"Columns {missing} is not defined in the model!")
 
     @classmethod
     def _resolve_user_defined_expressions(cls, namespace: dict) -> None:
@@ -125,7 +125,7 @@ class ValidationMetaClass(type):
             Raised whenever the user output is not a tuple of Expr (validator) and str (error).
         """
         dataframe_columns = namespace["_dataframe_column_names"]
-        column_mapping = namespace.get("_dataframe_column_mapping", {})
+        column_mapping = namespace["_dataframe_column_mapping"]
 
         for user_function in filter(callable, namespace.values()):
             # The function needs to be wrapped (which gives it an id attribute)
@@ -163,7 +163,7 @@ class ValidationMetaClass(type):
         """
         Resolves all user and default setters and validator expressions.
         """
-        class_annotations = namespace.get("__annotations__", {})
+        class_annotations = namespace["__annotations__"]
 
         for name, type_ in class_annotations.items():
             # We defined some attributes ourselves too, so ignore those
@@ -186,10 +186,10 @@ class ValidationMetaClass(type):
                     validator(index=next(cls._index_generator))
                 )
 
-    def __new__(cls, name: str, bases: tuple, namespace: dict) -> "ValidationMetaClass":
-        if not namespace.get("settings"):
-            namespace.setdefault("settings", ValidationSettings())
-
+    @classmethod
+    def _set_defaults(cls, namespace: dict) -> None:
+        namespace.setdefault("__annotations__", {})
+        namespace.setdefault("settings", ValidationSettings())
         namespace.setdefault("_identifier_columns", [])
         namespace.setdefault("_setter_expressions", [])
         namespace.setdefault("_validator_expressions", [])
@@ -198,6 +198,8 @@ class ValidationMetaClass(type):
         namespace.setdefault("_dataframe_column_names", [])
         namespace.setdefault("_dataframe_schema", {})
 
+    def __new__(cls, name: str, bases: tuple, namespace: dict) -> "ValidationMetaClass":
+        cls._set_defaults(namespace=namespace)
         cls._resolve_columns(namespace=namespace)
         cls._resolve_user_defined_expressions(namespace=namespace)
         cls._resolve_expressions(namespace=namespace)

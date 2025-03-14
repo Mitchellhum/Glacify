@@ -159,7 +159,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
 
             for setter in self._setter_expressions:
                 lazyframe = lazyframe.with_columns(setter)
-            
+
             self._dataframe = lazyframe.collect()
         except PolarsError as error:
             raise GlacifyCriticalException(
@@ -186,7 +186,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
             raise GlacifyCriticalException(
                 f"Cannot find the following columns inside the dataframe, are the columns spelled correctly? '{missing_columns}'"
             )
-    
+
     def _validate_identifiers(self) -> None:
         """
         Checks whether any identifiers exist, otherwise adds a row index as identifier.
@@ -194,6 +194,35 @@ class ValidationBase(metaclass=ValidationMetaClass):
         if not self._identifier_columns:
             self._dataframe = self._dataframe.with_row_index(name="__index", offset=1)
             self._identifier_columns.append("__index")
+
+    def _shift_to_row(self) -> None:
+        """
+        Sets all headers to a new row as set by the user.
+        """
+        to_row = self.settings.shift_to_row
+
+        # Got to make sure that the user did not set any bs value
+        if not isinstance(to_row, int) or to_row <= 0:
+            return
+
+        # Get the new header values
+        extracted_values = self._dataframe.row(to_row - 1, named=False)
+        new_headers = [str(header) for header in extracted_values]
+        rename_mapping = {
+            old: new for old, new in zip(self._dataframe.columns, new_headers)
+        }
+
+        # Add an index to identify all skipped rows
+        self._dataframe = self._dataframe.with_row_index(name="__temp_index", offset=1)
+
+        # Filter out all skipped rows and rename the headers
+        self._dataframe = (
+            self._dataframe.lazy()
+            .rename(mapping=rename_mapping)
+            .filter(col("__temp_index") > to_row)
+            .drop(col("__temp_index"))
+            .collect()
+        )
 
     def validate(self, dataframe: DataFrame) -> None:
         """
@@ -214,6 +243,7 @@ class ValidationBase(metaclass=ValidationMetaClass):
         self._dataframe = dataframe
         self._error_inner = defaultdict(list)
 
+        self._shift_to_row()
         self._validate_identifiers()
         self._validate_columns()
         self._execute_setters()

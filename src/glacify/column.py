@@ -38,7 +38,7 @@ class Column:
         native default value.
     strict : Optional[bool]
         Determines whether the datatype is strictly set, meaning if true, any wrong datatypes will throw an error.
-        If false, any wrong datatypes will turn in to null. This parameter overwrites ValidationSettings.strict! 
+        If false, any wrong datatypes will turn in to null. This parameter overwrites ValidationSettings.strict!
     min_length : Optional[int]
         Sets the minimal length of iteratable column types, such as strings and lists.
     max_length : Optional[int]
@@ -84,7 +84,7 @@ class Column:
     le: Optional[int | float | date | datetime] = None
     ge: Optional[int | float | date | datetime] = None
     equal_to: Optional[PythonType] = None
-    
+
     # Private Fields
     _type: Optional[PolarsType] = field(default=None, init=False)
     _setters: list[Expr] = field(default_factory=lambda: [], init=False)
