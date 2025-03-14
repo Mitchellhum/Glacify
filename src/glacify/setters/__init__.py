@@ -3,9 +3,9 @@ from typing import Optional
 
 from polars import Expr
 
-from glacier.setters.temporal import get_date_setters, get_datetime_setters
-from glacier.setters.general import get_general_setters
-from glacier.types import PythonType
+from glacify.setters.temporal import get_date_setters, get_datetime_setters
+from glacify.setters.general import get_general_setters
+from glacify.types import PythonType
 
 
 def get_setters(

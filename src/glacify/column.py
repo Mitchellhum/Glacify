@@ -5,9 +5,9 @@ from typing import Optional, get_args, get_origin, List as TypedList
 
 from polars import Expr, String
 
-from glacier.setters import get_setters
-from glacier.types import PolarsType, PythonType, PYTHON_POLARS_TYPE_MAPPING
-from glacier.validators import get_validators
+from glacify.setters import get_setters
+from glacify.types import PolarsType, PythonType, PYTHON_POLARS_TYPE_MAPPING
+from glacify.validators import get_validators
 
 
 @dataclass(repr=False, eq=False, match_args=False)
@@ -57,7 +57,7 @@ class Column:
     Examples
     --------
     >>> from polars import Expr, col, lit
-    >>> from glacier import ValidationBase, Column, validator, ValidationSettings
+    >>> from glacify import ValidationBase, Column, validator, ValidationSettings
     ...
     >>> class NewClass(ValidationBase):
     ...    settings = ValidationSettings(strict=False)

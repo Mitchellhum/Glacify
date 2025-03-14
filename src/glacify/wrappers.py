@@ -32,7 +32,7 @@ def validation_check(selection: Optional[list[str]] = None) -> Callable:
     Creating a validator class and defining validation rules:
 
     >>> from polars import Expr, col, lit
-    >>> from glacier import ValidationBase, Column, validation_check, ValidationSettings
+    >>> from glacify import ValidationBase, Column, validation_check, ValidationSettings
     ...
     >>> class ExampleValidator(ValidationBase):
     ...     settings = ValidationSettings(strict=False)

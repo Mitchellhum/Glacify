@@ -5,11 +5,13 @@ name = "pypi"
 
 [packages]
 polars = "==1.22.0"
+build = "*"
 
 [dev-packages]
 black = "*"
 twine = "*"
 sphinx = "*"
+packaging = "*"
 
 [requires]
 python_version = "3.11"

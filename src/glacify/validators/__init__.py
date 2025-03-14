@@ -2,11 +2,11 @@ from datetime import date, datetime
 from functools import partial
 from typing import Optional
 
-from glacier.types import PythonType
-from glacier.validators.general import get_general_validators
-from glacier.validators.numeric import get_numeric_validators
-from glacier.validators.string import get_string_validators
-from glacier.validators.temporal import get_date_validators
+from glacify.types import PythonType
+from glacify.validators.general import get_general_validators
+from glacify.validators.numeric import get_numeric_validators
+from glacify.validators.string import get_string_validators
+from glacify.validators.temporal import get_date_validators
 
 
 def get_validators(

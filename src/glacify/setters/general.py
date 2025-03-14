@@ -2,7 +2,7 @@ from typing import Optional
 
 from polars import col, Expr, lit
 
-from glacier.types import PythonType
+from glacify.types import PythonType
 
 
 def set_default(column: str, value: PythonType, type_: PythonType) -> Expr:

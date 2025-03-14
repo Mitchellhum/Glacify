@@ -1,14 +1,14 @@
-class GlacierCriticalException(Exception):
+class GlacifyCriticalException(Exception):
     """
-    Occurs whenever the glacier validation model runs in to an error
+    Occurs whenever the glacify validation model runs in to an error
     that prevents the model from validating the dataframe. Often, these 
     errors are caused by bugs/unexpected behaviour and should be reported
-    to the Glacier github page.
+    to the Glacify github page.
     """
     pass
 
 
-class GlacierValidationException(Exception):
+class GlacifyValidationException(Exception):
     """
     The main error thrown by the validation model. A regular occurence, as this would
     mean that the validation model is doing a good job.
